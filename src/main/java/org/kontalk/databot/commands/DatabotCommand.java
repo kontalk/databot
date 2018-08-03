@@ -18,8 +18,6 @@
 
 package org.kontalk.databot.commands;
 
-import org.bouncycastle.openpgp.PGPException;
-import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
@@ -27,15 +25,12 @@ import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.EntityBareJid;
 import org.kontalk.konbot.client.XMPPTCPConnection;
 import org.kontalk.konbot.shell.HelpableCommand;
-import org.kontalk.konbot.shell.ShellCommand;
 import org.kontalk.konbot.shell.ShellSession;
 import org.kontalk.konbot.shell.commands.AbstractCommand;
 import org.kontalk.konbot.shell.commands.ConnectCommand;
-import org.kontalk.konbot.shell.commands.HttpServerCommand;
 import org.kontalk.konbot.util.MessageUtils;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -56,7 +51,7 @@ public class DatabotCommand extends AbstractCommand implements HelpableCommand {
     }
 
     @Override
-    public void run(String[] args, ShellSession session) {
+    public void run(String[] args, ShellSession session) throws Exception {
         if (args.length < 2) {
             help();
             return;
@@ -77,16 +72,18 @@ public class DatabotCommand extends AbstractCommand implements HelpableCommand {
 
         // register a message listener and reply with a random element from the dataset
         XMPPTCPConnection conn = ConnectCommand.connection(session);
-        ChatManager.getInstanceFor(conn).addIncomingListener((entityBareJid, message, chat) -> {
-            String text = randomData(dataset(session));
-            Message reply = new Message(entityBareJid, Message.Type.chat);
-            reply.setBody(text);
-            try {
-                chat.send(MessageUtils.signMessage(reply));
-            }
-            catch (Exception e) {
-                println("Unable to send message: " + e);
-                e.printStackTrace(out);
+        ChatManager.getInstanceFor(conn).addIncomingListener(new IncomingChatMessageListener() {
+            @Override
+            public void newIncomingMessage(EntityBareJid entityBareJid, Message message, Chat chat) {
+                String text = DatabotCommand.this.randomData(dataset(session));
+                Message reply = new Message(entityBareJid, Message.Type.chat);
+                reply.setBody(text);
+                try {
+                    chat.send(MessageUtils.signMessage(reply));
+                } catch (Exception e) {
+                    DatabotCommand.this.println("Unable to send message: " + e);
+                    e.printStackTrace(out);
+                }
             }
         });
     }

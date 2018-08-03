@@ -42,11 +42,11 @@ public class Databot extends Konbot {
         try {
             BotShell sh = new BotShell();
             sh.init();
-            sh.run(ArrayUtils.addAll(new String[]{"server"}, serverSpec.split(" ")));
-            sh.run("personalkey", personalKeyFile, personalKeyPassphrase);
-            sh.run("connect");
-            sh.run("httpserver");
-            sh.run("databot", datasetFile);
+            sh.runCommand(ArrayUtils.addAll(new String[]{"server"}, serverSpec.split(" ")));
+            sh.runCommand("personalkey", personalKeyFile, personalKeyPassphrase);
+            sh.runCommand("connect");
+            sh.runCommand("httpserver");
+            sh.runCommand("databot", datasetFile);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -55,7 +55,13 @@ public class Databot extends Konbot {
     }
 
     public static void main(String[] args) {
-        new Databot(args).run();
+        if (args.length < 4) {
+            System.err.println("Usage: databot <dataset_file> <server_spec> <personalkey_file> <personalkey_passphrase>");
+            System.exit(1);
+        }
+        else {
+            new Databot(args).run();
+        }
     }
 
 }
