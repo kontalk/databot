@@ -33,6 +33,8 @@ import org.kontalk.konbot.util.MessageUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Properties;
 import java.util.Random;
 
@@ -61,7 +63,7 @@ public class DatabotCommand extends AbstractCommand implements HelpableCommand {
         // load dataset and put in session
         try (InputStream in = new FileInputStream(datasetFile)) {
             Properties dataset = new Properties();
-            dataset.load(in);
+            dataset.load(new InputStreamReader(in, Charset.forName("UTF-8")));
             session.put("databot.dataset", dataset);
         }
         catch (IOException e) {
