@@ -45,7 +45,7 @@ public class Databot extends Konbot {
             sh.runCommand(ArrayUtils.addAll(new String[]{"server"}, serverSpec.split(" ")));
             sh.runCommand("personalkey", personalKeyFile, personalKeyPassphrase);
             sh.runCommand("connect");
-            //sh.runCommand("httpserver");
+            sh.runCommand("httpserver");
             sh.runCommand("databot", datasetFile);
         }
         catch (Exception e) {
